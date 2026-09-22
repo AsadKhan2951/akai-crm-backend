@@ -1,0 +1,31 @@
+{
+  "name": "akai-crm-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AKAI CRM database (Supabase Postgres): migrations, RLS policies, database functions, seed data and scheduled jobs.",
+  "scripts": {
+    "db:link": "supabase link --project-ref $SUPABASE_PROJECT_REF",
+    "db:push": "supabase db push",
+    "db:pull-schema": "prisma db pull",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "check": "node scripts/check-migrations.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "prisma": "^6.13.0",
+    "supabase": "^2.40.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "packageManager": "pnpm@10.4.1"
+}

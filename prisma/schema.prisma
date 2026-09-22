@@ -1,0 +1,2216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Portal {
+  ADMIN
+  SALES
+  VENDOR
+}
+
+enum DataScope {
+  GLOBAL
+  TEAM
+  OWN
+  SELF
+}
+
+enum ProfileStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum CustomerType {
+  AUTO_PARTS
+  OIL_CHANGE
+  CAR_WASH
+  DETAILING
+  PAINT_HARDWARE
+  FUEL_STATION
+  DISTRIBUTOR
+  OTHER
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+  BLOCKED
+}
+
+enum PriceListStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  SUPERSEDED
+}
+
+enum PriceListApprovalStatus {
+  NOT_REQUIRED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CartStatus {
+  ACTIVE
+  CHECKED_OUT
+  ABANDONED
+}
+
+enum PaymentMethod {
+  BALANCE
+  CREDIT
+}
+
+enum PriceAnnouncementStatus {
+  DRAFT
+  READY
+  QUEUED
+  SENT
+}
+
+enum VisibilityScopeType {
+  GROUP
+  VENDOR
+}
+
+enum VisibilityEntityType {
+  CATEGORY
+  BRAND
+  PRODUCT
+}
+
+enum VisibilityMode {
+  ALLOW
+  DENY
+}
+
+enum BannerLinkType {
+  PRODUCT
+  CATEGORY
+  BRAND
+  COLLECTION
+  EXTERNAL_URL
+  NONE
+}
+
+enum BannerCtaType {
+  BUY_NOW
+  REQUEST_QUOTE
+  VIEW
+}
+
+enum BannerAudienceType {
+  ALL
+  GROUP
+  SPECIFIC_VENDORS
+}
+
+enum SchemeType {
+  QUANTITY_FREE
+  SLAB_DISCOUNT
+  BUNDLE
+  CATEGORY_TARGET
+  FLAT_DISCOUNT
+}
+
+enum SchemeScopeType {
+  PRODUCT
+  CATEGORY
+  BRAND
+  COLLECTION
+  ORDER_VALUE
+}
+
+enum SchemeAudienceType {
+  ALL
+  GROUP
+  SPECIFIC_VENDORS
+}
+
+enum SchemeBenefitType {
+  FREE_ITEM
+  DISCOUNT_PERCENT
+  DISCOUNT_AMOUNT
+}
+
+enum BannerEventType {
+  IMPRESSION
+  CLICK
+}
+
+enum PlacedVia {
+  VENDOR_PORTAL
+  SALES_AGENT
+  ADMIN
+  WHATSAPP
+  QUOTE_CONVERSION
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PLACED
+  CONFIRMED
+  PICKED
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
+
+enum DeliveryRunStatus {
+  PLANNED
+  LOADED
+  IN_TRANSIT
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliveryStopStatus {
+  PENDING
+  DELIVERED
+  PARTIAL
+  FAILED
+  RESCHEDULED
+}
+
+enum PickingListStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  REQUESTED
+  IN_REVIEW
+  QUOTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED
+}
+
+enum LeadSource {
+  FIELD_VISIT
+  REFERRAL
+  PHONE_IN
+  WALK_IN
+  CAMPAIGN
+  IMPORT
+  OTHER
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum ActivityType {
+  CALL
+  WHATSAPP
+  EMAIL
+  VISIT
+  NOTE
+  MEETING
+}
+
+enum ActivityDisposition {
+  CONNECTED
+  NO_ANSWER
+  BUSY
+  WRONG_NUMBER
+  CALLBACK_REQUESTED
+  NOT_INTERESTED
+  INTERESTED
+  ORDER_PLACED
+  QUOTE_REQUESTED
+  FOLLOW_UP_SCHEDULED
+  COMPLAINT
+  PAYMENT_COLLECTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum LedgerEntryType {
+  INVOICE
+  PAYMENT
+  CREDIT_NOTE
+  ADJUSTMENT
+}
+
+enum RewardType {
+  DISCOUNT_AMOUNT
+  DISCOUNT_PERCENT
+  FREE_PRODUCT
+  GIFT
+}
+
+enum RedemptionStatus {
+  REQUESTED
+  APPROVED
+  FULFILLED
+  REJECTED
+}
+
+enum MessageChannel {
+  WHATSAPP
+  EMAIL
+  SMS
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  QUEUED
+  RECEIVED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum WhatsappSessionState {
+  IDLE
+  BROWSING
+  BUILDING_CART
+  CONFIRMING
+  AWAITING_HUMAN
+}
+
+enum AiSurface {
+  WIDGET
+  CATALOG_SEARCH
+  COMPOSE
+  ANALYTICS
+}
+
+enum AiMessageRole {
+  user
+  assistant
+}
+
+enum CollectionMethod {
+  CASH
+  CHEQUE
+  BANK_TRANSFER
+  ONLINE
+}
+
+enum CollectionStatus {
+  COLLECTED
+  DEPOSITED
+  CLEARED
+  BOUNCED
+  CANCELLED
+}
+
+enum CashDepositStatus {
+  PENDING
+  VERIFIED
+  DISPUTED
+}
+
+enum RecoveryReminderStatus {
+  DRAFT
+  QUEUED
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum ClaimType {
+  DAMAGED
+  SHORT_SUPPLY
+  WRONG_ITEM
+  EXPIRED
+  WARRANTY
+  QUALITY
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
+enum ClaimResolutionType {
+  REPLACEMENT
+  CREDIT_NOTE
+  REFUND
+  REPAIR
+  NO_ACTION
+}
+
+enum BeatVisitStatus {
+  PLANNED
+  VISITED
+  SKIPPED
+  RESCHEDULED
+}
+
+enum VoiceProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+model Profile {
+  id                String             @id
+  displayName       String?            @map("display_name")
+  phone             String?
+  preferredLocale   String             @default("en") @map("preferred_locale")
+  status            ProfileStatus      @default(ACTIVE)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  portalMemberships PortalMembership[]
+  userRoles         UserRole[]
+
+  @@map("profiles")
+}
+
+model PortalMembership {
+  id         String   @id @default(cuid())
+  profileId  String   @map("profile_id")
+  portal     Portal
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  profile    Profile  @relation(fields: [profileId], references: [id])
+
+  @@unique([profileId, portal])
+  @@index([profileId, isActive])
+  @@map("portal_memberships")
+}
+
+model User {
+  id                String       @id
+  email             String       @unique
+  fullName          String       @map("full_name")
+  phone             String?
+  roleId            String       @map("role_id")
+  managerId         String?      @map("manager_id")
+  isActive          Boolean      @default(true) @map("is_active")
+  preferredLocale   String       @default("en") @map("preferred_locale")
+  permissionVersion Int          @default(1) @map("permission_version")
+  lastLoginAt       DateTime?    @map("last_login_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+  role              Role         @relation("UserRole", fields: [roleId], references: [id])
+  manager           User?        @relation("UserManager", fields: [managerId], references: [id])
+  reports           User[]       @relation("UserManager")
+  salesAgent        SalesAgent?
+  vendorAccount     VendorAccount?
+  createdRoles      Role[]       @relation("RoleCreatedBy")
+  auditEvents       AuditLog[]   @relation("AuditUser")
+  customerLinks     CustomerUser[]
+  aiConversations   AiConversation[]
+  aiUsage           AiUsage[]
+  aiRateLimitBuckets AiRateLimitBucket[]
+  notifications     Notification[]
+  leadImportBatches  LeadImportBatch[]
+  adminReportDefinitions AdminReportDefinition[] @relation("AdminReportCreator")
+  adminImpersonationStarted AdminImpersonationSession[] @relation("AdminImpersonationAdmin")
+  adminImpersonationTargets AdminImpersonationSession[] @relation("AdminImpersonationTargetUser")
+  acknowledgedAnomalies AdminAnomalyAlert[] @relation("AnomalyAcknowledgedBy")
+  dashboardCaches AdminDashboardCache[]
+  createdAdminUserInvites AdminUserInvite[] @relation("AdminInviteCreator")
+  managedAdminUserInvites AdminUserInvite[] @relation("AdminInviteManager")
+  createdPaymentCollections PaymentCollection[] @relation("CollectionCreator")
+  createdCashDeposits CashDeposit[] @relation("CashDepositCreator")
+  verifiedCashDeposits CashDeposit[] @relation("CashDepositVerifier")
+  createdRecoveryReminders RecoveryReminderQueue[] @relation("ReminderCreator")
+  updatedReminderPreferences CollectionReminderPreference[] @relation("ReminderPreferenceUpdater")
+  pushSubscriptions WebPushSubscription[]
+  createdSchemes Scheme[] @relation("SchemeCreator")
+  deliveryRunsAsDriver DeliveryRun[] @relation("DeliveryDriver")
+  createdDeliveryRuns DeliveryRun[] @relation("DeliveryRunCreator")
+  createdPickingLists PickingList[]
+  raisedClaims Claim[] @relation("ClaimRaisedBy")
+  reviewedClaims Claim[] @relation("ClaimReviewedBy")
+  registeredWarranties WarrantyRegistration[]
+  uploadedClaimPhotos ClaimPhoto[]
+  whatsappSessions WhatsappSession[] @relation("WhatsappSessionHandedOff")
+  voiceNotes VoiceNote[]
+
+  @@index([roleId, isActive])
+  @@index([managerId, isActive])
+  @@map("users")
+}
+
+model Role {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String?
+  dataScope       DataScope        @default(GLOBAL) @map("data_scope")
+  portalAccess    Portal           @default(ADMIN) @map("portal_access")
+  isSystemRole    Boolean          @default(false) @map("is_system_role")
+  isActive        Boolean          @default(true) @map("is_active")
+  createdByUserId String?          @map("created_by_user_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  createdByUser   User?            @relation("RoleCreatedBy", fields: [createdByUserId], references: [id])
+  users           User[]           @relation("UserRole")
+  permissions     RolePermission[]
+  userRoles       UserRole[]
+  adminUserInvites AdminUserInvite[]
+
+  @@index([isActive, portalAccess])
+  @@index([dataScope])
+  @@map("roles")
+}
+
+model Permission {
+  id               String                 @id @default(cuid())
+  key              String                 @unique
+  module           String
+  labelEn          String                 @map("label_en")
+  labelUr          String                 @map("label_ur")
+  description      String?
+  isSensitive      Boolean                @default(false) @map("is_sensitive")
+  displayOrder     Int                    @default(0) @map("display_order")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  roleLinks        RolePermission[]
+  dependencies     PermissionDependency[] @relation("DependentPermission")
+  prerequisites    PermissionDependency[] @relation("PrerequisitePermission")
+
+  @@index([module, displayOrder])
+  @@map("permissions")
+}
+
+model PermissionDependency {
+  permissionId        String     @map("permission_id")
+  requiresPermissionId String     @map("requires_permission_id")
+  permission          Permission @relation("DependentPermission", fields: [permissionId], references: [id])
+  requiresPermission  Permission @relation("PrerequisitePermission", fields: [requiresPermissionId], references: [id])
+
+  @@id([permissionId, requiresPermissionId])
+  @@index([requiresPermissionId])
+  @@map("permission_dependencies")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  profileId  String   @map("profile_id")
+  roleId     String   @map("role_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  role       Role     @relation(fields: [roleId], references: [id])
+
+  @@id([profileId, roleId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model SalesAgent {
+  id               String       @id @default(uuid())
+  userId           String       @unique @map("user_id")
+  agentCode        String       @unique @map("agent_code")
+  territory        String
+  monthlyTargetPKR Decimal      @map("monthly_target_pkr")
+  joinedAt         DateTime     @map("joined_at")
+  user             User         @relation(fields: [userId], references: [id])
+  customers        Customer[]
+  leadImportBatches LeadImportBatch[]
+  calendarFeedTokens CalendarFeedToken[]
+  paymentCollections PaymentCollection[]
+  cashDeposits CashDeposit[]
+  recoveryTargets RecoveryTarget[]
+  recoveryReminders RecoveryReminderQueue[]
+  claims Claim[]
+  beats Beat[]
+  beatVisits BeatVisit[]
+
+  @@index([territory])
+  @@map("sales_agents")
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String?   @map("user_id")
+  action      String
+  entityType  String    @map("entity_type")
+  entityId    String    @map("entity_id")
+  changesJson Json?     @map("changes_json")
+  ipAddress   String?   @map("ip_address")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  user        User?     @relation("AuditUser", fields: [userId], references: [id])
+
+  @@index([entityType, entityId, createdAt])
+  @@index([userId, createdAt])
+  @@map("audit_logs")
+}
+
+model StorageObject {
+  id           String   @id @default(cuid())
+  bucket       String
+  objectPath   String   @map("object_path")
+  contentType  String   @map("content_type")
+  sizeBytes    Int      @map("size_bytes")
+  uploadedBy   String   @map("uploaded_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([bucket, objectPath])
+  @@index([uploadedBy, createdAt])
+  @@map("storage_objects")
+}
+
+model AreaCode {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  fullNameEn String  @map("full_name_en")
+  fullNameUr String  @map("full_name_ur")
+  town      String
+  latitude  Decimal?
+  longitude Decimal?
+  customers Customer[]
+
+  @@index([town])
+  @@map("area_codes")
+}
+
+model VendorGroup {
+  id              String    @id @default(uuid())
+  name            String    @unique
+  description     String?
+  isDefault       Boolean   @default(false) @map("is_default")
+  showAllByDefault Boolean  @default(false) @map("show_all_by_default")
+  priceMultiplier Decimal   @default(1.0) @map("price_multiplier")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  customers       Customer[]
+  bannerAudiences PromoBannerAudience[]
+  schemeAudiences SchemeAudience[]
+  beatFrequencyTargets BeatFrequencyTarget[]
+
+  @@index([isDefault])
+  @@map("vendor_groups")
+}
+
+model Customer {
+  id                    String         @id @default(uuid())
+  legacyName            String         @map("name")
+  businessName          String         @map("business_name")
+  businessNameUrdu      String?        @map("business_name_urdu")
+  areaCode              String         @map("area_code")
+  normalizedName        String         @map("normalized_name")
+  fullAddress           String?        @map("full_address")
+  latitude              Decimal?
+  longitude             Decimal?
+  contactPersonName     String?        @map("contact_person_name")
+  primaryPhone          String?        @map("primary_phone")
+  whatsappPhone         String?        @map("whatsapp_phone")
+  email                 String?
+  customerType          CustomerType   @map("customer_type")
+  customerTypeSuggestion CustomerType? @map("customer_type_suggestion")
+  duplicateReviewRequired Boolean      @default(false) @map("duplicate_review_required")
+  duplicateReviewReason String?        @map("duplicate_review_reason")
+  importBatchId         String?        @map("import_batch_id")
+  importSourceRow       Int?           @map("import_source_row")
+  importKey             String         @unique @map("import_key")
+  importedAt            DateTime?      @map("imported_at")
+  assignedAgentId       String?        @map("assigned_agent_id")
+  vendorGroupId         String?        @map("vendor_group_id")
+  creditLimitPKR        Decimal        @map("credit_limit_pkr")
+  currentBalancePKR     Decimal        @map("current_balance_pkr")
+  loyaltyPointsBalance  Int            @default(0) @map("loyalty_points_balance")
+  status                CustomerStatus @default(PROSPECT)
+  dataComplete          Boolean        @default(false) @map("data_complete")
+  isInternalAccount     Boolean        @default(false) @map("is_internal_account")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+  assignedAgent         SalesAgent?    @relation(fields: [assignedAgentId], references: [id])
+  area                  AreaCode       @relation(fields: [areaCode], references: [code])
+  vendorGroup           VendorGroup?   @relation(fields: [vendorGroupId], references: [id])
+  vendorAccount         VendorAccount?
+  userLinks             CustomerUser[]
+  bannerAudiences       PromoBannerAudience[]
+  bannerEvents          BannerEvent[]
+  schemeAudiences       SchemeAudience[]
+  schemeApplications    SchemeApplication[]
+  adminImpersonationTargetCustomers AdminImpersonationSession[] @relation("AdminImpersonationTargetCustomer")
+  paymentCollections PaymentCollection[]
+  collectionReminderPreference CollectionReminderPreference?
+  recoveryReminders RecoveryReminderQueue[]
+  creditRiskSnapshots CreditRiskSnapshot[]
+  deliveryStops DeliveryStop[]
+  claims Claim[]
+  warrantyRegistrations WarrantyRegistration[]
+  beatCustomers BeatCustomer[]
+  beatVisits BeatVisit[]
+  whatsappSessions WhatsappSession[] @relation("WhatsappCustomerSession")
+  voiceNotes VoiceNote[]
+
+  @@index([assignedAgentId, status])
+  @@index([vendorGroupId, status])
+  @@index([areaCode])
+  @@index([normalizedName])
+  @@index([assignedAgentId, dataComplete, areaCode])
+  @@index([customerType, status])
+  @@index([businessName])
+  @@map("customers")
+}
+
+model CustomerUser {
+  userId      String   @map("user_id")
+  customerId  String   @map("customer_id")
+  user        User     @relation(fields: [userId], references: [id])
+  customer    Customer @relation(fields: [customerId], references: [id])
+
+  @@id([userId, customerId])
+  @@index([customerId])
+  @@map("customer_users")
+}
+
+model VendorAccount {
+  id              String   @id @default(uuid())
+  customerId      String   @unique @map("customer_id")
+  userId          String   @unique @map("user_id")
+  canPlaceOrders  Boolean  @default(true) @map("can_place_orders")
+  canRequestQuotes Boolean @default(true) @map("can_request_quotes")
+  customer        Customer @relation(fields: [customerId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("vendor_accounts")
+}
+
+model Brand {
+  id           String   @id @default(uuid())
+  nameEn       String   @map("name_en")
+  nameUr       String   @map("name_ur")
+  slug         String   @unique
+  logoUrl      String?  @map("logo_url")
+  displayOrder Int      @default(0) @map("display_order")
+  isActive     Boolean  @default(true) @map("is_active")
+  notes        String?
+
+  @@index([isActive, displayOrder])
+  @@map("brands")
+}
+
+model Category {
+  id               String    @id @default(uuid())
+  nameEn           String    @map("name_en")
+  nameUr           String    @map("name_ur")
+  slug             String    @unique
+  imageUrl         String?   @map("image_url")
+  displayOrder     Int       @default(0) @map("display_order")
+  isActive         Boolean   @default(true) @map("is_active")
+  parentCategoryId  String?   @map("parent_category_id")
+  description      String?
+  notes            String?
+  parentCategory   Category? @relation("CategoryParent", fields: [parentCategoryId], references: [id])
+  children         Category[] @relation("CategoryParent")
+
+  @@index([isActive, displayOrder])
+  @@index([parentCategoryId])
+  @@map("categories")
+}
+
+model Collection {
+  id           String    @id @default(uuid())
+  nameEn       String    @map("name_en")
+  nameUr       String    @map("name_ur")
+  slug         String    @unique
+  imageUrl     String?   @map("image_url")
+  description  String?
+  displayOrder Int       @default(0) @map("display_order")
+  isActive     Boolean   @default(true) @map("is_active")
+  startsAt     DateTime? @map("starts_at")
+  endsAt       DateTime? @map("ends_at")
+
+  @@index([isActive, displayOrder])
+  @@index([startsAt, endsAt])
+  @@map("collections")
+}
+
+model Product {
+  id                  String          @id @default(uuid())
+  sku                 String          @unique
+  nameEn              String          @map("name_en")
+  nameUr              String          @map("name_ur")
+  descriptionEn       String?         @map("description_en")
+  descriptionUr       String?         @map("description_ur")
+  categoryId          String          @map("category_id")
+  brandId             String?         @map("brand_id")
+  unitOfMeasure       String          @map("unit_of_measure")
+  packSize            Decimal?        @map("pack_size")
+  pricePKR            Decimal         @map("price_pkr")
+  compareAtPricePKR   Decimal?        @map("compare_at_price_pkr")
+  loyaltyPointsPerUnit Int            @default(0) @map("loyalty_points_per_unit")
+  warrantyMonths      Int?            @map("warranty_months")
+  stockQuantity       Decimal         @map("stock_quantity")
+  lowStockThreshold   Decimal         @map("low_stock_threshold")
+  isActive            Boolean         @default(true) @map("is_active")
+  isQuoteOnly         Boolean         @default(false) @map("is_quote_only")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  cost                ProductCost?
+  freeSchemeTiers     SchemeTier[] @relation("SchemeFreeProduct")
+  schemeApplicationFreeProducts SchemeApplication[] @relation("SchemeApplicationFreeProduct")
+  pickingListLines PickingListLine[]
+  claimLines ClaimLine[]
+  warrantyRegistrations WarrantyRegistration[]
+
+  @@index([categoryId, isActive])
+  @@index([brandId, isActive])
+  @@index([isActive, nameEn])
+  @@index([stockQuantity, lowStockThreshold])
+  @@map("products")
+}
+
+model ProductCost {
+  productId String  @id @map("product_id")
+  costPKR   Decimal @map("cost_pkr")
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("product_costs")
+}
+
+model ProductImage {
+  id           String  @id @default(uuid())
+  productId    String  @map("product_id")
+  url          String
+  altTextEn    String? @map("alt_text_en")
+  altTextUr    String? @map("alt_text_ur")
+  displayOrder Int     @default(0) @map("display_order")
+  isPrimary    Boolean @default(false) @map("is_primary")
+
+  @@index([productId, displayOrder])
+  @@map("product_images")
+}
+
+model ProductCollection {
+  productId    String @map("product_id")
+  collectionId String @map("collection_id")
+  displayOrder Int    @default(0) @map("display_order")
+
+  @@id([productId, collectionId])
+  @@index([collectionId, displayOrder])
+  @@map("product_collections")
+}
+
+model PriceList {
+  id                String          @id @default(uuid())
+  name              String
+  effectiveFrom     DateTime        @map("effective_from")
+  effectiveTo       DateTime?       @map("effective_to")
+  status            PriceListStatus
+  basedOnPriceListId String?        @map("based_on_price_list_id")
+  notes             String?
+  createdByUserId   String          @map("created_by_user_id")
+  approvalRequired  Boolean         @default(true) @map("approval_required")
+  approvalStatus    PriceListApprovalStatus @default(PENDING) @map("approval_status")
+  approvedByUserId  String?         @map("approved_by_user_id")
+  approvedAt        DateTime?       @map("approved_at")
+  rejectionReason   String?         @map("rejection_reason")
+  activatedAt       DateTime?       @map("activated_at")
+  cataloguePdfUrl   String?         @map("catalogue_pdf_url")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@index([status, effectiveFrom])
+  @@index([basedOnPriceListId])
+  @@map("price_lists")
+}
+
+model PriceListItem {
+  id                String   @id @default(uuid())
+  priceListId       String   @map("price_list_id")
+  productId         String   @map("product_id")
+  pricePKR          Decimal  @map("price_pkr")
+  compareAtPricePKR Decimal? @map("compare_at_price_pkr")
+  cost              PriceListItemCost?
+
+  @@unique([priceListId, productId])
+  @@index([productId])
+  @@map("price_list_items")
+}
+
+model PriceListItemCost {
+  priceListItemId String        @id @map("price_list_item_id")
+  costPKR         Decimal       @map("cost_pkr")
+  priceListItem   PriceListItem @relation(fields: [priceListItemId], references: [id])
+
+  @@map("price_list_item_costs")
+}
+
+model CatalogVisibilityRule {
+  id              String               @id @default(uuid())
+  scopeType       VisibilityScopeType  @map("scope_type")
+  scopeId         String               @map("scope_id")
+  entityType      VisibilityEntityType @map("entity_type")
+  entityId        String               @map("entity_id")
+  mode            VisibilityMode
+  createdAt       DateTime             @default(now()) @map("created_at")
+  createdByUserId String               @map("created_by_user_id")
+
+  @@index([scopeType, scopeId, entityType, entityId])
+  @@index([entityType, entityId, mode])
+  @@map("catalog_visibility_rules")
+}
+
+model PromoBanner {
+  id              String              @id @default(uuid())
+  titleEn         String              @map("title_en")
+  titleUr         String              @map("title_ur")
+  subtitleEn      String?             @map("subtitle_en")
+  subtitleUr      String?             @map("subtitle_ur")
+  imageUrl        String              @map("image_url")
+  imageUrlUr      String?             @map("image_url_ur")
+  linkType        BannerLinkType      @map("link_type")
+  linkTargetId    String?             @map("link_target_id")
+  externalUrl     String?             @map("external_url")
+  ctaType         BannerCtaType       @map("cta_type")
+  audienceType    BannerAudienceType  @map("audience_type")
+  displayOrder    Int                 @default(0) @map("display_order")
+  startsAt        DateTime            @map("starts_at")
+  endsAt          DateTime            @map("ends_at")
+  isActive        Boolean             @default(true) @map("is_active")
+  createdByUserId String              @map("created_by_user_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  audiences       PromoBannerAudience[]
+  events          BannerEvent[]
+
+  @@index([isActive, startsAt, endsAt, displayOrder])
+  @@map("promo_banners")
+}
+
+model PromoBannerAudience {
+  id            String  @id @default(uuid())
+  bannerId      String  @map("banner_id")
+  vendorGroupId String? @map("vendor_group_id")
+  customerId    String? @map("customer_id")
+  banner        PromoBanner @relation(fields: [bannerId], references: [id])
+  vendorGroup   VendorGroup? @relation(fields: [vendorGroupId], references: [id])
+  customer      Customer? @relation(fields: [customerId], references: [id])
+
+  @@index([bannerId])
+  @@index([vendorGroupId])
+  @@index([customerId])
+  @@map("promo_banner_audiences")
+}
+
+model BannerEvent {
+  id         String          @id @default(uuid())
+  bannerId   String          @map("banner_id")
+  customerId String          @map("customer_id")
+  eventType  BannerEventType @map("event_type")
+  occurredAt DateTime        @default(now()) @map("occurred_at")
+  banner     PromoBanner      @relation(fields: [bannerId], references: [id])
+  customer   Customer         @relation(fields: [customerId], references: [id])
+
+  @@index([bannerId, eventType, occurredAt])
+  @@index([customerId, occurredAt])
+  @@map("banner_events")
+}
+
+model Order {
+  id               String     @id @default(uuid())
+  orderNumber      String     @unique @map("order_number")
+  customerId       String     @map("customer_id")
+  placedByUserId   String     @map("placed_by_user_id")
+  placedVia        PlacedVia  @map("placed_via")
+  paymentMethod    PaymentMethod @default(BALANCE) @map("payment_method")
+  sourceQuoteId    String?    @map("source_quote_id")
+  status           OrderStatus
+  approvalRequired  Boolean   @default(false) @map("approval_required")
+  approvedByUserId String?    @map("approved_by_user_id")
+  approvedAt       DateTime?  @map("approved_at")
+  rejectionReason  String?    @map("rejection_reason")
+  subtotalPKR      Decimal    @map("subtotal_pkr")
+  discountPKR     Decimal    @map("discount_pkr")
+  pointsRedeemed  Int        @default(0) @map("points_redeemed")
+  pointsDiscountPKR Decimal  @map("points_discount_pkr")
+  totalPKR        Decimal    @map("total_pkr")
+  pointsEarned    Int        @default(0) @map("points_earned")
+  notes           String?
+  placedAt        DateTime   @map("placed_at")
+  confirmedAt     DateTime?  @map("confirmed_at")
+  deliveredAt     DateTime?  @map("delivered_at")
+
+  schemeApplications SchemeApplication[]
+  deliveryStops DeliveryStop[]
+  claims Claim[] @relation("ClaimOrder")
+  replacementClaims Claim[] @relation("ClaimReplacementOrder")
+
+  @@index([customerId, placedAt])
+  @@index([placedByUserId, placedAt])
+  @@index([status, placedAt])
+  @@map("orders")
+}
+
+model OrderLine {
+  id             String   @id @default(uuid())
+  orderId        String   @map("order_id")
+  productId      String   @map("product_id")
+  quantity       Decimal
+  unitPricePKR   Decimal  @map("unit_price_pkr")
+  lineTotalPKR   Decimal  @map("line_total_pkr")
+  isFreeItem     Boolean  @default(false) @map("is_free_item")
+  redemptionId   String?  @map("redemption_id")
+  priceListId    String?  @map("price_list_id")
+  priceListItemId String? @map("price_list_item_id")
+  schemeApplicationId String? @map("scheme_application_id")
+  schemeApplication SchemeApplication? @relation(fields: [schemeApplicationId], references: [id])
+  deliveryStopLines DeliveryStopLine[]
+  pickingAllocations PickingListOrderLine[]
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_lines")
+}
+
+model Quote {
+  id               String      @id @default(uuid())
+  quoteNumber      String      @unique @map("quote_number")
+  customerId       String      @map("customer_id")
+  requestedByUserId String     @map("requested_by_user_id")
+  assignedToUserId String?     @map("assigned_to_user_id")
+  status           QuoteStatus
+  customerNotes    String?     @map("customer_notes")
+  internalNotes    String?     @map("internal_notes")
+  validUntil       DateTime?   @map("valid_until")
+  quotedByUserId   String?     @map("quoted_by_user_id")
+  quotedAt         DateTime?   @map("quoted_at")
+  respondedAt      DateTime?   @map("responded_at")
+  rejectionReason  String?     @map("rejection_reason")
+  convertedOrderId String?     @map("converted_order_id")
+  createdAt        DateTime    @default(now()) @map("created_at")
+
+  @@index([customerId, createdAt])
+  @@index([assignedToUserId, status])
+  @@index([status, createdAt])
+  @@map("quotes")
+}
+
+model QuoteLine {
+  id                String   @id @default(uuid())
+  quoteId           String   @map("quote_id")
+  productId         String   @map("product_id")
+  quantity          Decimal
+  requestedNotes    String?  @map("requested_notes")
+  quotedUnitPricePKR Decimal? @map("quoted_unit_price_pkr")
+  lineTotalPKR      Decimal? @map("line_total_pkr")
+  priceListId       String?  @map("price_list_id")
+  priceListItemId   String?  @map("price_list_item_id")
+
+  @@index([quoteId])
+  @@index([productId])
+  @@map("quote_lines")
+}
+
+model Lead {
+  id                 String     @id @default(uuid())
+  businessName       String     @map("business_name")
+  contactName        String     @map("contact_name")
+  phone              String
+  email              String?
+  areaCode           String     @map("area_code")
+  fullAddress        String?    @map("full_address")
+  source             LeadSource
+  stage              LeadStage
+  assignedAgentId    String     @map("assigned_agent_id")
+  normalizedName     String     @map("normalized_name")
+  estimatedValuePKR  Decimal    @map("estimated_value_pkr")
+  aiScore            Decimal?   @map("ai_score")
+  aiScoreReason      String?    @map("ai_score_reason")
+  lostReason         String?    @map("lost_reason")
+  convertedCustomerId String?   @map("converted_customer_id")
+  importBatchId      String?    @map("import_batch_id")
+  stageEnteredAt     DateTime   @default(now()) @map("stage_entered_at")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  importBatch        LeadImportBatch? @relation(fields: [importBatchId], references: [id])
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+
+  @@index([assignedAgentId, stage])
+  @@index([stage, createdAt])
+  @@index([areaCode])
+  @@index([phone])
+  @@index([normalizedName])
+  @@index([importBatchId])
+  @@index([assignedAgentId, stage, stageEnteredAt])
+  @@map("leads")
+}
+
+model LeadImportBatch {
+  id              String      @id
+  createdByUserId String      @map("created_by_user_id")
+  assignedAgentId String      @map("assigned_agent_id")
+  sourceFilename  String?     @map("source_filename")
+  rowCount        Int         @default(0) @map("row_count")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  rolledBackAt    DateTime?   @map("rolled_back_at")
+  status          String      @default("ACTIVE")
+  createdByUser   User        @relation(fields: [createdByUserId], references: [id])
+  assignedAgent   SalesAgent  @relation(fields: [assignedAgentId], references: [id])
+  leads           Lead[]
+
+  @@index([createdByUserId, status, createdAt])
+  @@index([assignedAgentId, createdAt])
+  @@map("lead_import_batches")
+}
+
+model CalendarFeedToken {
+  id           String     @id @default(uuid())
+  salesAgentId String     @map("sales_agent_id")
+  tokenHash    String     @unique @map("token_hash")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  lastUsedAt   DateTime?  @map("last_used_at")
+  revokedAt    DateTime?  @map("revoked_at")
+  salesAgent   SalesAgent @relation(fields: [salesAgentId], references: [id])
+
+  @@index([salesAgentId, revokedAt])
+  @@map("calendar_feed_tokens")
+}
+
+model Activity {
+  id                        String             @id @default(uuid())
+  type                      ActivityType
+  leadId                    String?            @map("lead_id")
+  customerId                String?            @map("customer_id")
+  agentId                   String             @map("agent_id")
+  disposition               ActivityDisposition
+  notes                     String
+  durationSeconds           Int?               @map("duration_seconds")
+  latitude                  Decimal?
+  longitude                 Decimal?
+  locationAccuracyMeters    Decimal?           @map("location_accuracy_meters")
+  distanceFromCustomerMeters Decimal?           @map("distance_from_customer_meters")
+  occurredAt                DateTime           @map("occurred_at")
+  createdAt                 DateTime           @default(now()) @map("created_at")
+
+  @@index([agentId, occurredAt])
+  @@index([customerId, occurredAt])
+  @@index([leadId, occurredAt])
+  beatVisit BeatVisit?
+  voiceNotes VoiceNote[]
+  @@map("activities")
+}
+
+model Beat {
+  id                    String                 @id @default(uuid())
+  name                  String
+  agentId               String                 @map("agent_id")
+  dayOfWeek             Int                    @map("day_of_week")
+  areaCodes             String[]               @default([]) @map("area_codes")
+  targetFrequencyDays   Int                    @default(30) @map("target_frequency_days")
+  isActive              Boolean                @default(true) @map("is_active")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  agent                 SalesAgent             @relation(fields: [agentId], references: [id])
+  customers             BeatCustomer[]
+  frequencyTargets      BeatFrequencyTarget[]
+  visits                BeatVisit[]
+
+  @@index([agentId, dayOfWeek, isActive])
+  @@map("beats")
+}
+
+model BeatCustomer {
+  beatId                String                 @map("beat_id")
+  customerId            String                 @map("customer_id")
+  sequence              Int
+  assignedAt            DateTime               @default(now()) @map("assigned_at")
+  beat                  Beat                   @relation(fields: [beatId], references: [id])
+  customer              Customer               @relation(fields: [customerId], references: [id])
+
+  @@id([beatId, customerId])
+  @@index([customerId, beatId])
+  @@index([beatId, sequence])
+  @@map("beat_customers")
+}
+
+model BeatFrequencyTarget {
+  id                    String                 @id @default(uuid())
+  beatId                String                 @map("beat_id")
+  customerType          CustomerType?         @map("customer_type")
+  vendorGroupId         String?                @map("vendor_group_id")
+  frequencyDays         Int                    @map("frequency_days")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  beat                  Beat                   @relation(fields: [beatId], references: [id])
+  vendorGroup           VendorGroup?           @relation(fields: [vendorGroupId], references: [id])
+
+  @@index([beatId, customerType, vendorGroupId])
+  @@map("beat_frequency_targets")
+}
+
+model BeatVisit {
+  id                    String                 @id @default(uuid())
+  beatId                String                 @map("beat_id")
+  agentId               String                 @map("agent_id")
+  customerId            String                 @map("customer_id")
+  plannedDate           DateTime               @map("planned_date")
+  status                BeatVisitStatus        @default(PLANNED)
+  activityId            String?                @unique @map("activity_id")
+  skipReason            String?                @map("skip_reason")
+  completedAt           DateTime?              @map("completed_at")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  beat                  Beat                   @relation(fields: [beatId], references: [id])
+  agent                 SalesAgent             @relation(fields: [agentId], references: [id])
+  customer              Customer               @relation(fields: [customerId], references: [id])
+  activity              Activity?              @relation(fields: [activityId], references: [id])
+
+  @@index([agentId, plannedDate, status])
+  @@index([beatId, plannedDate, status, customerId])
+  @@index([customerId, plannedDate])
+  @@map("beat_visits")
+}
+
+model FollowUp {
+  id              String   @id @default(uuid())
+  activityId      String?  @map("activity_id")
+  leadId          String?  @map("lead_id")
+  customerId      String?  @map("customer_id")
+  agentId         String   @map("agent_id")
+  dueAt           DateTime @map("due_at")
+  priority        Priority
+  note            String
+  isCompleted     Boolean  @default(false) @map("is_completed")
+  completedAt     DateTime? @map("completed_at")
+  calendarEventUid String?  @map("calendar_event_uid")
+
+  @@index([agentId, isCompleted, dueAt])
+  @@index([leadId, dueAt])
+  @@index([customerId, dueAt])
+  @@map("follow_ups")
+}
+
+model LedgerEntry {
+  id               String          @id @default(uuid())
+  customerId       String          @map("customer_id")
+  type             LedgerEntryType
+  amountPKR        Decimal         @map("amount_pkr")
+  referenceNumber  String          @map("reference_number")
+  description      String
+  entryDate        DateTime        @map("entry_date")
+  recordedByUserId String          @map("recorded_by_user_id")
+
+  @@index([customerId, entryDate])
+  @@index([type, entryDate])
+  paymentCollection PaymentCollection?
+  claimCreditNote Claim? @relation("ClaimCreditNote")
+
+  @@map("ledger_entries")
+}
+
+model PaymentCollection {
+  id                    String           @id @default(uuid())
+  customerId            String           @map("customer_id")
+  agentId               String           @map("agent_id")
+  amountPKR             Decimal          @map("amount_pkr")
+  method                CollectionMethod
+  chequeNumber          String?          @map("cheque_number")
+  chequeDate            DateTime?        @map("cheque_date")
+  bankName              String?          @map("bank_name")
+  receiptNumber         String           @unique @map("receipt_number")
+  againstInvoiceNumbers String[]         @default([]) @map("against_invoice_numbers")
+  status                CollectionStatus @default(COLLECTED)
+  collectedAt           DateTime         @default(now()) @map("collected_at")
+  depositedAt           DateTime?        @map("deposited_at")
+  clearedAt             DateTime?        @map("cleared_at")
+  bouncedReason         String?          @map("bounced_reason")
+  latitude              Decimal?
+  longitude             Decimal?
+  photoUrl              String?          @map("photo_url")
+  notes                 String?
+  ledgerEntryId        String?          @unique @map("ledger_entry_id")
+  createdByUserId       String?          @map("created_by_user_id")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  customer              Customer         @relation(fields: [customerId], references: [id])
+  agent                 SalesAgent       @relation(fields: [agentId], references: [id])
+  ledgerEntry           LedgerEntry?     @relation(fields: [ledgerEntryId], references: [id])
+  createdByUser         User?            @relation("CollectionCreator", fields: [createdByUserId], references: [id])
+  depositLinks          CashDepositCollection[]
+
+  @@index([agentId, status, collectedAt])
+  @@index([customerId, status, collectedAt])
+  @@index([status, collectedAt])
+  @@map("payment_collections")
+}
+
+model CashDeposit {
+  id                String           @id @default(uuid())
+  agentId           String           @map("agent_id")
+  totalAmountPKR    Decimal          @map("total_amount_pkr")
+  depositSlipUrl    String?          @map("deposit_slip_url")
+  depositedAt       DateTime         @default(now()) @map("deposited_at")
+  verifiedByUserId  String?          @map("verified_by_user_id")
+  verifiedAt        DateTime?        @map("verified_at")
+  status            CashDepositStatus @default(PENDING)
+  notes             String?
+  createdByUserId   String           @map("created_by_user_id")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  agent             SalesAgent       @relation(fields: [agentId], references: [id])
+  verifiedBy        User?            @relation("CashDepositVerifier", fields: [verifiedByUserId], references: [id])
+  createdBy         User             @relation("CashDepositCreator", fields: [createdByUserId], references: [id])
+  collections       CashDepositCollection[]
+
+  @@index([agentId, status, depositedAt])
+  @@index([status, depositedAt])
+  @@map("cash_deposits")
+}
+
+model CashDepositCollection {
+  depositId    String            @map("deposit_id")
+  collectionId String            @map("collection_id")
+  deposit      CashDeposit       @relation(fields: [depositId], references: [id])
+  collection   PaymentCollection @relation(fields: [collectionId], references: [id])
+
+  @@id([depositId, collectionId])
+  @@index([collectionId])
+  @@map("cash_deposit_collections")
+}
+
+model RecoveryTarget {
+  id               String     @id @default(uuid())
+  agentId          String     @map("agent_id")
+  month            DateTime
+  targetAmountPKR  Decimal    @map("target_amount_pkr")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  agent            SalesAgent @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, month])
+  @@index([month, agentId])
+  @@map("recovery_targets")
+}
+
+model CollectionReminderPreference {
+  customerId       String   @id @map("customer_id")
+  optedOut         Boolean  @default(false) @map("opted_out")
+  preferredLocale  String   @default("en") @map("preferred_locale")
+  openDispute      Boolean  @default(false) @map("open_dispute")
+  updatedByUserId  String?  @map("updated_by_user_id")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+  customer         Customer @relation(fields: [customerId], references: [id])
+  updatedByUser    User?    @relation("ReminderPreferenceUpdater", fields: [updatedByUserId], references: [id])
+
+  @@map("collection_reminder_preferences")
+}
+
+model RecoveryReminderQueue {
+  id                   String                 @id @default(uuid())
+  customerId           String                 @map("customer_id")
+  agentId              String                 @map("agent_id")
+  channel              MessageChannel
+  locale               String                 @default("en")
+  thresholdDays        Int                    @map("threshold_days")
+  body                 String
+  againstInvoiceNumbers String[]              @map("against_invoice_numbers")
+  status               RecoveryReminderStatus @default(DRAFT)
+  scheduledFor         DateTime?              @map("scheduled_for")
+  sentAt               DateTime?              @map("sent_at")
+  cancelledAt          DateTime?              @map("cancelled_at")
+  createdByUserId      String                 @map("created_by_user_id")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  customer             Customer               @relation(fields: [customerId], references: [id])
+  agent                SalesAgent             @relation(fields: [agentId], references: [id])
+  createdByUser        User                   @relation("ReminderCreator", fields: [createdByUserId], references: [id])
+
+  @@index([status, scheduledFor])
+  @@index([customerId, status])
+  @@map("recovery_reminder_queue")
+}
+
+model CreditRiskSnapshot {
+  id             String   @id @default(uuid())
+  customerId     String   @map("customer_id")
+  score          Decimal
+  reasonsJson    Json     @default("[]") @map("reasons_json")
+  computedAt     DateTime @default(now()) @map("computed_at")
+  modelVersion   String   @default("sql-v1") @map("model_version")
+  customer       Customer @relation(fields: [customerId], references: [id])
+
+  @@index([customerId, computedAt])
+  @@map("credit_risk_snapshots")
+}
+
+model LoyaltyTransaction {
+  id              String   @id @default(uuid())
+  customerId      String   @map("customer_id")
+  orderId         String?  @map("order_id")
+  redemptionId    String?  @map("redemption_id")
+  points          Int
+  reason          String
+  idempotencyKey  String   @unique @map("idempotency_key")
+  createdByUserId String?  @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([customerId, createdAt])
+  @@index([orderId])
+  @@map("loyalty_transactions")
+}
+
+model Reward {
+  id                  String     @id @default(uuid())
+  nameEn              String     @map("name_en")
+  nameUr              String     @map("name_ur")
+  descriptionEn      String?    @map("description_en")
+  descriptionUr      String?    @map("description_ur")
+  imageUrl            String?    @map("image_url")
+  rewardType          RewardType @map("reward_type")
+  pointsCost          Int        @map("points_cost")
+  discountValuePKR    Decimal?   @map("discount_value_pkr")
+  discountPercent     Decimal?   @map("discount_percent")
+  freeProductId       String?    @map("free_product_id")
+  freeProductQuantity Decimal?   @map("free_product_quantity")
+  stockLimit          Int?       @map("stock_limit")
+  redeemedCount       Int        @default(0) @map("redeemed_count")
+  isActive            Boolean    @default(true) @map("is_active")
+  startsAt            DateTime?  @map("starts_at")
+  endsAt              DateTime?  @map("ends_at")
+
+  @@index([isActive, startsAt, endsAt])
+  @@map("rewards")
+}
+
+model Redemption {
+  id               String           @id @default(uuid())
+  customerId       String           @map("customer_id")
+  rewardId         String           @map("reward_id")
+  orderId          String?          @map("order_id")
+  pointsSpent      Int              @map("points_spent")
+  status           RedemptionStatus
+  requestedAt      DateTime         @map("requested_at")
+  approvedByUserId String?          @map("approved_by_user_id")
+  fulfilledAt      DateTime?        @map("fulfilled_at")
+  notes            String?
+  rejectedReason   String?          @map("rejected_reason")
+
+  @@index([customerId, requestedAt])
+  @@index([status, requestedAt])
+  @@map("redemptions")
+}
+
+model MessageLog {
+  id                String          @id @default(uuid())
+  channel           MessageChannel
+  direction         MessageDirection
+  customerId        String?         @map("customer_id")
+  leadId            String?         @map("lead_id")
+  toAddress         String          @map("to_address")
+  templateName      String?         @map("template_name")
+  body              String
+  status            MessageStatus
+  providerMessageId String?         @map("provider_message_id")
+  errorMessage      String?         @map("error_message")
+  sentAt            DateTime?       @map("sent_at")
+  provider          String?
+  subject           String?
+  senderAddress     String?         @map("sender_address")
+  threadKey         String?         @map("thread_key")
+  externalEventId   String?         @map("external_event_id")
+  metadataJson      Json?           @map("metadata_json")
+  attemptCount      Int             @default(0) @map("attempt_count")
+  nextAttemptAt     DateTime?       @map("next_attempt_at")
+  lastAttemptAt     DateTime?       @map("last_attempt_at")
+  lockedAt          DateTime?       @map("locked_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@index([customerId, sentAt])
+  @@index([status, sentAt])
+  @@index([status, nextAttemptAt])
+  @@index([status, lockedAt])
+  @@index([threadKey, createdAt])
+  @@unique([externalEventId])
+  @@map("message_logs")
+}
+
+model MessageTemplate {
+  id                   String   @id @default(uuid())
+  key                  String
+  channel              String
+  locale               String
+  subject              String?
+  body                 String
+  providerTemplateName String?  @map("provider_template_name")
+  approvalStatus       String   @default("DRAFT") @map("approval_status")
+  isActive             Boolean  @default(true) @map("is_active")
+  createdByUserId      String?  @map("created_by_user_id")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@unique([key, channel, locale])
+  @@index([channel, isActive])
+  @@map("message_templates")
+}
+
+model MessagingCampaign {
+  id              String   @id @default(uuid())
+  name            String
+  channel         MessageChannel
+  templateKey     String   @map("template_key")
+  segmentJson     Json     @default("{}") @map("segment_json")
+  status          String   @default("DRAFT")
+  createdByUserId String   @map("created_by_user_id")
+  queuedAt        DateTime? @map("queued_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([createdByUserId, createdAt])
+  @@index([status, queuedAt])
+  @@map("messaging_campaigns")
+}
+
+model WebPushSubscription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+  deliveries NotificationPushDelivery[]
+
+  @@unique([userId, endpoint])
+  @@index([userId, createdAt])
+  @@map("web_push_subscriptions")
+}
+
+model NotificationPushDelivery {
+  id             String              @id @default(uuid())
+  notificationId String              @map("notification_id")
+  subscriptionId String              @map("subscription_id")
+  status         String              @default("QUEUED")
+  errorMessage   String?             @map("error_message")
+  sentAt         DateTime?           @map("sent_at")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  notification   Notification        @relation(fields: [notificationId], references: [id])
+  subscription   WebPushSubscription @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([notificationId, subscriptionId])
+  @@index([status, createdAt])
+  @@map("notification_push_deliveries")
+}
+
+model MessageWebhookEvent {
+  id           String   @id @default(uuid())
+  provider     String
+  externalId  String   @map("external_id")
+  payloadJson Json     @map("payload_json")
+  receivedAt  DateTime @default(now()) @map("received_at")
+
+  @@unique([provider, externalId])
+  @@index([provider, receivedAt])
+  @@map("message_webhook_events")
+}
+
+model AiConversation {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  surface   AiSurface
+  title     String
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id])
+  messages  AiMessage[]
+
+  @@index([userId, createdAt])
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id             String          @id @default(uuid())
+  conversationId String          @map("conversation_id")
+  role           AiMessageRole
+  content        String
+  toolCallsJson  Json?           @map("tool_calls_json")
+  tokensUsed     Int?            @map("tokens_used")
+  latencyMs      Int?            @map("latency_ms")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  conversation   AiConversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}
+
+model AiUsage {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  date         DateTime
+  inputTokens  Int      @map("input_tokens")
+  outputTokens Int      @map("output_tokens")
+  reservedTokens Int    @default(0) @map("reserved_tokens")
+  requestCount Int      @map("request_count")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@index([date])
+  @@map("ai_usage")
+}
+
+model AiRateLimitBucket {
+  userId       String   @map("user_id")
+  windowStart  DateTime @map("window_start")
+  requestCount Int      @default(0) @map("request_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, windowStart])
+  @@index([createdAt])
+  @@map("ai_rate_limit_buckets")
+}
+
+model Setting {
+  key             String   @id
+  valueJson       Json     @map("value_json")
+  description     String?
+  updatedByUserId String   @map("updated_by_user_id")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String
+  titleEn   String   @map("title_en")
+  titleUr   String   @map("title_ur")
+  body      String
+  bodyEn    String?  @map("body_en")
+  bodyUr    String?  @map("body_ur")
+  linkUrl   String?  @map("link_url")
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  pushDeliveries NotificationPushDelivery[]
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
+
+model AdminReportDefinition {
+  id              String   @id @default(uuid())
+  name            String
+  entity          String
+  columnsJson     Json     @default("[]") @map("columns_json")
+  filtersJson     Json     @default("{}") @map("filters_json")
+  outputFormat    String   @default("CSV") @map("output_format")
+  scheduleCron    String?  @map("schedule_cron")
+  recipientsJson  Json     @default("[]") @map("recipients_json")
+  createdByUserId String   @map("created_by_user_id")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdByUser   User     @relation("AdminReportCreator", fields: [createdByUserId], references: [id])
+  runs            AdminReportRun[]
+
+  @@index([createdByUserId, isActive, updatedAt])
+  @@map("admin_report_definitions")
+}
+
+model AdminReportRun {
+  id           String   @id @default(uuid())
+  definitionId String   @map("definition_id")
+  status       String   @default("QUEUED")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  artifactUrl  String?  @map("artifact_url")
+  rowCount     Int?     @map("row_count")
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at")
+  definition   AdminReportDefinition @relation(fields: [definitionId], references: [id])
+
+  @@index([definitionId, createdAt])
+  @@index([status, createdAt])
+  @@map("admin_report_runs")
+}
+
+model AdminImpersonationSession {
+  id               String   @id @default(uuid())
+  adminUserId      String   @map("admin_user_id")
+  targetUserId     String?  @map("target_user_id")
+  targetCustomerId String?  @map("target_customer_id")
+  mode             String
+  startedAt        DateTime @default(now()) @map("started_at")
+  expiresAt        DateTime @map("expires_at")
+  endedAt          DateTime? @map("ended_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  adminUser        User     @relation("AdminImpersonationAdmin", fields: [adminUserId], references: [id])
+  targetUser       User?    @relation("AdminImpersonationTargetUser", fields: [targetUserId], references: [id])
+  targetCustomer   Customer? @relation("AdminImpersonationTargetCustomer", fields: [targetCustomerId], references: [id])
+
+  @@index([adminUserId, endedAt, expiresAt])
+  @@index([targetUserId, targetCustomerId, startedAt])
+  @@map("admin_impersonation_sessions")
+}
+
+model AdminAnomalyAlert {
+  id                    String   @id @default(uuid())
+  alertType             String   @map("alert_type")
+  entityId              String?  @map("entity_id")
+  title                 String
+  body                  String
+  supportingMetricsJson Json     @default("{}") @map("supporting_metrics_json")
+  status                String   @default("OPEN")
+  createdAt             DateTime @default(now()) @map("created_at")
+  acknowledgedByUserId  String?  @map("acknowledged_by_user_id")
+  acknowledgedAt        DateTime? @map("acknowledged_at")
+  acknowledgedBy        User?    @relation("AnomalyAcknowledgedBy", fields: [acknowledgedByUserId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([alertType, entityId, createdAt])
+  @@map("admin_anomaly_alerts")
+}
+
+model AdminUserInvite {
+  id              String   @id @default(uuid())
+  email           String
+  fullName        String   @map("full_name")
+  phone           String?
+  roleId          String   @map("role_id")
+  managerId       String?  @map("manager_id")
+  preferredLocale String   @default("en") @map("preferred_locale")
+  status          String   @default("PENDING")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  expiresAt       DateTime @default(now()) @map("expires_at")
+  role            Role     @relation(fields: [roleId], references: [id])
+  manager         User?    @relation("AdminInviteManager", fields: [managerId], references: [id])
+  createdByUser   User     @relation("AdminInviteCreator", fields: [createdByUserId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@map("admin_user_invites")
+}
+
+model AdminDashboardCache {
+  userId      String   @map("user_id")
+  rangeStart  DateTime @map("range_start")
+  rangeEnd    DateTime @map("range_end")
+  payloadJson Json     @map("payload_json")
+  generatedAt DateTime @default(now()) @map("generated_at")
+  expiresAt   DateTime @map("expires_at")
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, rangeStart, rangeEnd])
+  @@index([expiresAt])
+  @@map("admin_dashboard_cache")
+}
+
+model PriceListItemAudit {
+  id              String   @id @default(uuid())
+  priceListItemId String   @map("price_list_item_id")
+  productId       String   @map("product_id")
+  oldPricePKR     Decimal? @map("old_price_pkr")
+  newPricePKR     Decimal  @map("new_price_pkr")
+  changedByUserId String   @map("changed_by_user_id")
+  reason          String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([productId, createdAt])
+  @@index([priceListItemId, createdAt])
+  @@map("price_list_item_audits")
+}
+
+model Cart {
+  id                    String     @id @default(uuid())
+  customerId            String     @map("customer_id")
+  status                CartStatus @default(ACTIVE)
+  priceListId           String?    @map("price_list_id")
+  requiresPriceReview   Boolean    @default(false) @map("requires_price_review")
+  lastPricedAt          DateTime?  @map("last_priced_at")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+
+  @@index([customerId, status])
+  @@index([requiresPriceReview, updatedAt])
+  @@map("carts")
+}
+
+model CartLine {
+  id               String   @id @default(uuid())
+  cartId           String   @map("cart_id")
+  productId        String   @map("product_id")
+  quantity         Decimal
+  unitPricePKR     Decimal  @map("unit_price_pkr")
+  priceListId      String?  @map("price_list_id")
+  priceListItemId  String?  @map("price_list_item_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_lines")
+}
+
+model CartPriceChange {
+  id                String    @id @default(uuid())
+  cartId            String    @map("cart_id")
+  cartLineId        String    @map("cart_line_id")
+  productId         String    @map("product_id")
+  oldUnitPricePKR   Decimal   @map("old_unit_price_pkr")
+  newUnitPricePKR   Decimal   @map("new_unit_price_pkr")
+  oldPriceListId    String?   @map("old_price_list_id")
+  newPriceListId    String?   @map("new_price_list_id")
+  detectedAt        DateTime  @default(now()) @map("detected_at")
+  acknowledgedAt    DateTime? @map("acknowledged_at")
+
+  @@index([cartId, acknowledgedAt])
+  @@index([productId, detectedAt])
+  @@map("cart_price_changes")
+}
+
+model PriceAnnouncement {
+  id              String                   @id @default(uuid())
+  priceListId     String                   @map("price_list_id")
+  titleEn         String                   @map("title_en")
+  titleUr         String                   @map("title_ur")
+  bodyEn          String                   @map("body_en")
+  bodyUr          String                   @map("body_ur")
+  status          PriceAnnouncementStatus @default(DRAFT)
+  sendWhatsApp    Boolean                  @default(false) @map("send_whatsapp")
+  sendEmail       Boolean                  @default(false) @map("send_email")
+  scheduledFor    DateTime?                @map("scheduled_for")
+  sentAt          DateTime?                @map("sent_at")
+  createdByUserId String                   @map("created_by_user_id")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+
+  @@index([priceListId, status])
+  @@index([scheduledFor, status])
+  @@map("price_announcements")
+}
+
+model PriceAnnouncementItem {
+  id             String   @id @default(uuid())
+  announcementId String   @map("announcement_id")
+  productId      String   @map("product_id")
+  oldPricePKR    Decimal? @map("old_price_pkr")
+  newPricePKR    Decimal  @map("new_price_pkr")
+
+  @@unique([announcementId, productId])
+  @@index([productId])
+  @@map("price_announcement_items")
+}
+
+model CataloguePdf {
+  id           String   @id @default(uuid())
+  priceListId  String   @map("price_list_id")
+  customerId   String?  @map("customer_id")
+  locale       String
+  storagePath  String   @map("storage_path")
+  generatedAt  DateTime @default(now()) @map("generated_at")
+  cacheUntil   DateTime @map("cache_until")
+  generatedBy  String   @map("generated_by")
+  pageCount    Int      @default(0) @map("page_count")
+
+  @@unique([priceListId, customerId, locale])
+  @@index([generatedAt])
+  @@map("catalogue_pdfs")
+}
+
+
+model Scheme {
+  id                    String             @id @default(uuid())
+  nameEn                String             @map("name_en")
+  nameUr                String             @map("name_ur")
+  descriptionEn         String?            @map("description_en")
+  descriptionUr         String?            @map("description_ur")
+  schemeType            SchemeType         @map("scheme_type")
+  scopeType             SchemeScopeType    @map("scope_type")
+  scopeIds              String[]           @map("scope_ids")
+  audienceType          SchemeAudienceType @map("audience_type")
+  priority              Int                @default(100)
+  isStackable           Boolean            @default(false) @map("is_stackable")
+  startsAt              DateTime           @map("starts_at")
+  endsAt                DateTime            @map("ends_at")
+  isActive              Boolean            @default(false) @map("is_active")
+  budgetPKR             Decimal?           @map("budget_pkr")
+  consumedPKR           Decimal            @default(0) @map("consumed_pkr")
+  maxRedemptionsPerVendor Int?             @map("max_redemptions_per_vendor")
+  termsEn               String             @map("terms_en")
+  termsUr               String             @map("terms_ur")
+  bannerImageUrl        String?            @map("banner_image_url")
+  createdByUserId       String             @map("created_by_user_id")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+  createdByUser         User               @relation("SchemeCreator", fields: [createdByUserId], references: [id])
+  tiers                 SchemeTier[]
+  audiences             SchemeAudience[]
+  applications          SchemeApplication[]
+
+  @@index([isActive, startsAt, endsAt, priority])
+  @@index([audienceType, isActive, startsAt, endsAt])
+  @@index([createdByUserId, createdAt])
+  @@map("schemes")
+}
+
+model SchemeTier {
+  id                String    @id @default(uuid())
+  schemeId          String    @map("scheme_id")
+  minQuantity       Decimal?  @map("min_quantity")
+  minValuePKR       Decimal?  @map("min_value_pkr")
+  freeProductId     String?   @map("free_product_id")
+  freeQuantity      Decimal?  @map("free_quantity")
+  discountPercent   Decimal?  @map("discount_percent")
+  discountAmountPKR Decimal?  @map("discount_amount_pkr")
+  displayOrder      Int       @default(0) @map("display_order")
+  scheme            Scheme    @relation(fields: [schemeId], references: [id])
+  freeProduct       Product?  @relation("SchemeFreeProduct", fields: [freeProductId], references: [id])
+  applications      SchemeApplication[]
+
+  @@index([schemeId, displayOrder])
+  @@index([freeProductId])
+  @@map("scheme_tiers")
+}
+
+model SchemeAudience {
+  id            String      @id @default(uuid())
+  schemeId      String      @map("scheme_id")
+  vendorGroupId String?     @map("vendor_group_id")
+  customerId    String?     @map("customer_id")
+  scheme        Scheme      @relation(fields: [schemeId], references: [id])
+  vendorGroup   VendorGroup? @relation(fields: [vendorGroupId], references: [id])
+  customer      Customer?   @relation(fields: [customerId], references: [id])
+
+  @@index([schemeId])
+  @@index([vendorGroupId])
+  @@index([customerId])
+  @@map("scheme_audiences")
+}
+
+model SchemeApplication {
+  id             String            @id @default(uuid())
+  schemeId       String            @map("scheme_id")
+  schemeTierId   String            @map("scheme_tier_id")
+  orderId        String            @map("order_id")
+  customerId     String            @map("customer_id")
+  benefitType    SchemeBenefitType @map("benefit_type")
+  benefitValuePKR Decimal          @map("benefit_value_pkr")
+  freeProductId  String?           @map("free_product_id")
+  freeQuantity   Decimal?          @map("free_quantity")
+  appliedAt      DateTime          @default(now()) @map("applied_at")
+  scheme         Scheme            @relation(fields: [schemeId], references: [id])
+  schemeTier     SchemeTier        @relation(fields: [schemeTierId], references: [id])
+  order          Order             @relation(fields: [orderId], references: [id])
+  customer       Customer          @relation(fields: [customerId], references: [id])
+  freeProduct    Product?          @relation("SchemeApplicationFreeProduct", fields: [freeProductId], references: [id])
+  orderLines     OrderLine[]
+
+  @@unique([schemeId, orderId])
+  @@index([customerId, appliedAt])
+  @@index([orderId])
+  @@index([schemeId, appliedAt])
+  @@map("scheme_applications")
+}
+
+
+model PickingList {
+  id            String           @id @default(uuid())
+  pickNumber    String           @unique @map("pick_number")
+  status        PickingListStatus @default(OPEN)
+  createdByUserId String          @map("created_by_user_id")
+  completedAt   DateTime?        @map("completed_at")
+  notes         String?
+  createdAt     DateTime         @default(now()) @map("created_at")
+  createdByUser User             @relation(fields: [createdByUserId], references: [id])
+  lines         PickingListLine[]
+
+  @@index([status, createdAt])
+  @@index([createdByUserId, createdAt])
+  @@map("picking_lists")
+}
+
+model PickingListLine {
+  id             String                 @id @default(uuid())
+  pickingListId  String                 @map("picking_list_id")
+  productId      String                 @map("product_id")
+  quantityRequired Decimal              @map("quantity_required")
+  quantityPicked Decimal              @default(0) @map("quantity_picked")
+  quantityShort  Decimal              @default(0) @map("quantity_short")
+  shortReason    String?               @map("short_reason")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  pickingList    PickingList           @relation(fields: [pickingListId], references: [id])
+  product        Product               @relation(fields: [productId], references: [id])
+  orderLines     PickingListOrderLine[]
+
+  @@unique([pickingListId, productId])
+  @@index([productId])
+  @@map("picking_list_lines")
+}
+
+model PickingListOrderLine {
+  id                String          @id @default(uuid())
+  pickingListLineId String          @map("picking_list_line_id")
+  orderLineId       String          @map("order_line_id")
+  quantityRequired  Decimal         @map("quantity_required")
+  quantityShort     Decimal         @default(0) @map("quantity_short")
+  shortReason       String?         @map("short_reason")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  pickingListLine    PickingListLine @relation(fields: [pickingListLineId], references: [id])
+  orderLine          OrderLine       @relation(fields: [orderLineId], references: [id])
+
+  @@unique([pickingListLineId, orderLineId])
+  @@index([orderLineId])
+  @@map("picking_list_order_lines")
+}
+
+model DeliveryRun {
+  id                    String           @id @default(uuid())
+  runNumber             String           @unique @map("run_number")
+  driverUserId          String?          @map("driver_user_id")
+  driverName            String           @map("driver_name")
+  vehicleNumber         String           @map("vehicle_number")
+  runDate               DateTime         @map("run_date")
+  status                DeliveryRunStatus @default(PLANNED)
+  totalStops            Int              @default(0) @map("total_stops")
+  completedStops        Int              @default(0) @map("completed_stops")
+  expectedCodAmountPKR  Decimal          @default(0) @map("expected_cod_amount_pkr")
+  collectedCodAmountPKR Decimal          @default(0) @map("collected_cod_amount_pkr")
+  startedAt             DateTime?        @map("started_at")
+  completedAt           DateTime?        @map("completed_at")
+  notes                 String?
+  createdByUserId       String           @map("created_by_user_id")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  driverUser            User?            @relation("DeliveryDriver", fields: [driverUserId], references: [id])
+  createdByUser         User             @relation("DeliveryRunCreator", fields: [createdByUserId], references: [id])
+  stops                 DeliveryStop[]
+  tokens                DeliveryRunToken[]
+
+  @@index([runDate, status])
+  @@index([driverUserId, runDate])
+  @@index([createdByUserId, createdAt])
+  @@map("delivery_runs")
+}
+
+model DeliveryStop {
+  id              String             @id @default(uuid())
+  runId           String             @map("run_id")
+  orderId         String             @map("order_id")
+  customerId      String             @map("customer_id")
+  sequence        Int
+  status          DeliveryStopStatus @default(PENDING)
+  deliveredAt     DateTime?          @map("delivered_at")
+  receivedByName  String?            @map("received_by_name")
+  signatureUrl    String?            @map("signature_url")
+  photoUrl        String?            @map("photo_url")
+  latitude        Decimal?
+  longitude       Decimal?
+  codAmountPKR    Decimal?           @map("cod_amount_pkr")
+  codCollected    Boolean            @default(false) @map("cod_collected")
+  failureReason   String?            @map("failure_reason")
+  notes           String?
+  createdAt       DateTime           @default(now()) @map("created_at")
+  run             DeliveryRun        @relation(fields: [runId], references: [id])
+  order           Order              @relation(fields: [orderId], references: [id])
+  customer        Customer           @relation(fields: [customerId], references: [id])
+  lines           DeliveryStopLine[]
+
+  @@unique([runId, sequence])
+  @@unique([runId, orderId])
+  @@index([orderId, status])
+  @@index([customerId, status])
+  @@index([runId, status, sequence])
+  @@map("delivery_stops")
+}
+
+model DeliveryStopLine {
+  id                String       @id @default(uuid())
+  stopId            String       @map("stop_id")
+  orderLineId       String       @map("order_line_id")
+  quantityDelivered Decimal      @default(0) @map("quantity_delivered")
+  quantityShort     Decimal      @default(0) @map("quantity_short")
+  shortReason       String?      @map("short_reason")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  stop              DeliveryStop @relation(fields: [stopId], references: [id])
+  orderLine         OrderLine    @relation(fields: [orderLineId], references: [id])
+  sourceClaims      Claim[]
+
+  @@unique([stopId, orderLineId])
+  @@index([orderLineId])
+  @@map("delivery_stop_lines")
+}
+
+model DeliveryRunToken {
+  id         String      @id @default(uuid())
+  runId      String      @map("run_id")
+  tokenHash  String      @unique @map("token_hash")
+  validOn    DateTime    @map("valid_on")
+  expiresAt  DateTime    @map("expires_at")
+  lastUsedAt DateTime?   @map("last_used_at")
+  revokedAt  DateTime?   @map("revoked_at")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  run        DeliveryRun @relation(fields: [runId], references: [id])
+
+  @@index([runId, validOn, revokedAt, expiresAt])
+  @@map("delivery_run_tokens")
+}
+
+
+model Claim {
+  id                      String              @id @default(uuid())
+  claimNumber             String              @unique @map("claim_number")
+  customerId              String              @map("customer_id")
+  orderId                 String?             @map("order_id")
+  raisedByUserId          String              @map("raised_by_user_id")
+  assignedAgentId         String?             @map("assigned_agent_id")
+  claimType               ClaimType           @map("claim_type")
+  status                  ClaimStatus
+  resolutionType          ClaimResolutionType? @map("resolution_type")
+  description             String
+  reviewedByUserId        String?             @map("reviewed_by_user_id")
+  reviewedAt              DateTime?           @map("reviewed_at")
+  firstReviewedAt         DateTime?           @map("first_reviewed_at")
+  rejectionReason         String?             @map("rejection_reason")
+  resolvedAt              DateTime?           @map("resolved_at")
+  creditNoteLedgerEntryId String?             @unique @map("credit_note_ledger_entry_id")
+  replacementOrderId      String?             @map("replacement_order_id")
+  sourceDeliveryStopLineId String?            @unique @map("source_delivery_stop_line_id")
+  resolutionNotes         String?             @map("resolution_notes")
+  createdAt               DateTime            @default(now()) @map("created_at")
+  customer                Customer            @relation(fields: [customerId], references: [id])
+  order                  Order?              @relation("ClaimOrder", fields: [orderId], references: [id])
+  replacementOrder       Order?              @relation("ClaimReplacementOrder", fields: [replacementOrderId], references: [id])
+  raisedByUser           User                @relation("ClaimRaisedBy", fields: [raisedByUserId], references: [id])
+  reviewedByUser         User?               @relation("ClaimReviewedBy", fields: [reviewedByUserId], references: [id])
+  assignedAgent          SalesAgent?         @relation(fields: [assignedAgentId], references: [id])
+  creditNoteLedgerEntry  LedgerEntry?        @relation("ClaimCreditNote", fields: [creditNoteLedgerEntryId], references: [id])
+  sourceDeliveryStopLine DeliveryStopLine?   @relation(fields: [sourceDeliveryStopLineId], references: [id])
+  lines                  ClaimLine[]
+  photos                 ClaimPhoto[]
+  voiceNotes             VoiceNote[]
+
+  @@index([customerId, status, createdAt])
+  @@index([assignedAgentId, status, createdAt])
+  @@index([claimType, status, createdAt])
+  @@map("claims")
+}
+
+model ClaimLine {
+  id           String   @id @default(uuid())
+  claimId      String   @map("claim_id")
+  productId    String   @map("product_id")
+  quantity     Decimal
+  batchOrSerial String? @map("batch_or_serial")
+  reasonNotes  String?  @map("reason_notes")
+  createdAt    DateTime @default(now()) @map("created_at")
+  claim        Claim    @relation(fields: [claimId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
+
+  @@index([claimId])
+  @@index([productId, claimId])
+  @@map("claim_lines")
+}
+
+model ClaimPhoto {
+  id                String   @id @default(uuid())
+  claimId           String   @map("claim_id")
+  url               String
+  caption           String?
+  uploadedAt        DateTime @default(now()) @map("uploaded_at")
+  uploadedByUserId  String?  @map("uploaded_by_user_id")
+  claim             Claim    @relation(fields: [claimId], references: [id])
+  uploadedByUser    User?    @relation(fields: [uploadedByUserId], references: [id])
+
+  @@index([claimId, uploadedAt])
+  @@map("claim_photos")
+}
+
+model WarrantyRegistration {
+  id                       String   @id @default(uuid())
+  productId                String   @map("product_id")
+  serialNumber             String   @unique @map("serial_number")
+  customerId               String   @map("customer_id")
+  endCustomerName          String?  @map("end_customer_name")
+  endCustomerPhone         String?  @map("end_customer_phone")
+  soldAt                   DateTime @map("sold_at")
+  warrantyMonths           Int      @map("warranty_months")
+  expiresAt                DateTime @map("expires_at")
+  registeredByUserId       String   @map("registered_by_user_id")
+  consentForConsumerContact Boolean @default(false) @map("consent_for_consumer_contact")
+  createdAt                DateTime @default(now()) @map("created_at")
+  product                  Product  @relation(fields: [productId], references: [id])
+  customer                 Customer @relation(fields: [customerId], references: [id])
+  registeredByUser         User     @relation(fields: [registeredByUserId], references: [id])
+
+  @@index([customerId, expiresAt])
+  @@index([productId, serialNumber])
+  @@index([expiresAt])
+  @@map("warranty_registrations")
+}
+
+
+model WhatsappSession {
+  id                String                @id @default(uuid())
+  phone             String                @unique
+  customerId        String?               @map("customer_id")
+  state             WhatsappSessionState  @default(IDLE)
+  cartJson          Json?                 @map("cart_json")
+  lastMessageAt     DateTime              @map("last_message_at")
+  expiresAt         DateTime              @map("expires_at")
+  handedOffToUserId String?               @map("handed_off_to_user_id")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  customer          Customer?             @relation("WhatsappCustomerSession", fields: [customerId], references: [id])
+  handedOffToUser   User?                 @relation("WhatsappSessionHandedOff", fields: [handedOffToUserId], references: [id])
+
+  @@index([customerId, state, lastMessageAt])
+  @@index([state, expiresAt])
+  @@map("whatsapp_sessions")
+}
+
+
+model VoiceNote {
+  id                   String                @id @default(uuid())
+  userId               String                @map("user_id")
+  activityId           String?               @map("activity_id")
+  claimId              String?               @map("claim_id")
+  customerId           String?               @map("customer_id")
+  audioUrl             String                @map("audio_url")
+  durationSeconds      Int                   @map("duration_seconds")
+  transcript           String?
+  transcriptLanguage   String?               @map("transcript_language")
+  structuredOutputJson Json?                 @map("structured_output_json")
+  processingStatus     VoiceProcessingStatus @default(PENDING) @map("processing_status")
+  processingError      String?               @map("processing_error")
+  processedAt          DateTime?             @map("processed_at")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  user                 User                  @relation(fields: [userId], references: [id])
+  activity             Activity?             @relation(fields: [activityId], references: [id])
+  claim                Claim?                @relation(fields: [claimId], references: [id])
+  customer             Customer?             @relation(fields: [customerId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([customerId, createdAt])
+  @@index([activityId])
+  @@index([claimId])
+  @@index([processingStatus, createdAt])
+  @@map("voice_notes")
+}
