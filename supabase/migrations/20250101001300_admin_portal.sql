@@ -211,7 +211,7 @@ begin
       group by cat.name_en
     ) x), '[]'::jsonb),
     'revenue_by_brand', coalesce((select jsonb_agg(x order by x.revenue_pkr desc) from (
-      select coalesce(b.name,'Unbranded') as brand, sum(ol.line_total_pkr)::numeric(12,2) as revenue_pkr
+      select coalesce(b.name_en,'Unbranded') as brand, sum(ol.line_total_pkr)::numeric(12,2) as revenue_pkr
       from public.order_lines ol join public.orders o on o.id=ol.order_id join public.customers c on c.id=o.customer_id join public.products p on p.id=ol.product_id left join public.brands b on b.id=p.brand_id
       where public.has_permission(auth.uid(),'financials.view_revenue') and o.status <> 'CANCELLED' and c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid())) and (o.placed_at at time zone 'Asia/Karachi')::date >= start_date and (o.placed_at at time zone 'Asia/Karachi')::date < end_date
       group by 1
@@ -252,29 +252,29 @@ grant execute on function public.admin_dashboard_analytics(date,date) to authent
 
 create or replace function public.approve_admin_order(p_order_id uuid)
 returns uuid language plpgsql security invoker set search_path = public as $$
-declare customer_id uuid; order_total numeric(12,2); begin
+declare v_customer_id uuid; order_total numeric(12,2); begin
   if not public.has_permission(auth.uid(),'order.approve') then raise exception using errcode='42501', message='Order approval is not permitted.'; end if;
-  select o.customer_id,o.total_pkr into customer_id,order_total from public.orders o join public.customers c on c.id=o.customer_id where o.id=p_order_id and o.status='PENDING_APPROVAL' and c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid())) for update;
+  select o.customer_id,o.total_pkr into v_customer_id,order_total from public.orders o join public.customers c on c.id=o.customer_id where o.id=p_order_id and o.status='PENDING_APPROVAL' and (public.role_scope(auth.uid())='GLOBAL' or c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid()))) for update of o;
   if not found then raise exception using errcode='42501', message='This order is outside your scope or is no longer awaiting approval.'; end if;
   update public.orders set status='CONFIRMED', approval_required=false, approved_by_user_id=auth.uid(), approved_at=now(), rejection_reason=null where id=p_order_id;
   insert into public.audit_logs(user_id,action,entity_type,entity_id,changes_json) values(auth.uid(),'APPROVE','ORDER',p_order_id::text,jsonb_build_object('status','CONFIRMED','total_pkr',order_total));
   insert into public.notifications(user_id,type,title_en,title_ur,body,link_url)
-  select distinct x.user_id,'ORDER_APPROVED','Order approved','Order approved','Your order has been approved.','/en/vendor/orders/'||p_order_id::text from public.customer_users x where x.customer_id=customer_id;
+  select distinct x.user_id,'ORDER_APPROVED','Order approved','Order approved','Your order has been approved.','/en/vendor/orders/'||p_order_id::text from public.customer_users x where x.customer_id=v_customer_id;
   return p_order_id;
 end; $$;
 grant execute on function public.approve_admin_order(uuid) to authenticated;
 
 create or replace function public.reject_admin_order(p_order_id uuid, p_reason text)
 returns uuid language plpgsql security invoker set search_path = public as $$
-declare customer_id uuid; begin
+declare v_customer_id uuid; begin
   if not public.has_permission(auth.uid(),'order.approve') then raise exception using errcode='42501', message='Order rejection is not permitted.'; end if;
   if nullif(trim(p_reason),'') is null then raise exception using errcode='22023', message='A rejection reason is required.'; end if;
-  select o.customer_id into customer_id from public.orders o join public.customers c on c.id=o.customer_id where o.id=p_order_id and o.status='PENDING_APPROVAL' and c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid())) for update;
+  select o.customer_id into v_customer_id from public.orders o join public.customers c on c.id=o.customer_id where o.id=p_order_id and o.status='PENDING_APPROVAL' and (public.role_scope(auth.uid())='GLOBAL' or c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid()))) for update of o;
   if not found then raise exception using errcode='42501', message='This order is outside your scope or is no longer awaiting approval.'; end if;
   update public.orders set status='CANCELLED', approval_required=false, approved_by_user_id=auth.uid(), approved_at=now(), rejection_reason=trim(p_reason) where id=p_order_id;
   insert into public.audit_logs(user_id,action,entity_type,entity_id,changes_json) values(auth.uid(),'REJECT','ORDER',p_order_id::text,jsonb_build_object('status','CANCELLED','reason',trim(p_reason)));
   insert into public.notifications(user_id,type,title_en,title_ur,body,link_url)
-  select distinct x.user_id,'ORDER_REJECTED','Order needs attention','Order needs attention','Your order was rejected: '||trim(p_reason),'/en/vendor/orders/'||p_order_id::text from public.customer_users x where x.customer_id=customer_id;
+  select distinct x.user_id,'ORDER_REJECTED','Order needs attention','Order needs attention','Your order was rejected: '||trim(p_reason),'/en/vendor/orders/'||p_order_id::text from public.customer_users x where x.customer_id=v_customer_id;
   return p_order_id;
 end; $$;
 grant execute on function public.reject_admin_order(uuid,text) to authenticated;
@@ -395,7 +395,7 @@ grant execute on function public.queue_due_admin_reports() to service_role;
 
 create or replace function public.generate_admin_anomaly_alerts()
 returns integer language plpgsql security definer set search_path=public as $$
-declare alert_count integer;
+declare alert_count integer; extra_count integer;
 begin
   insert into public.admin_anomaly_alerts(alert_type,entity_id,title,body,supporting_metrics_json)
   select 'AGENT_ACTIVITY_DROP', sa.id, 'Sales activity dropped', u.full_name || ' recorded no activity in the last 7 business days.', jsonb_build_object('recent_activity_count',0,'comparison_window_days',30)
@@ -412,7 +412,8 @@ begin
     and not exists (select 1 from public.orders o where o.customer_id=c.id and o.status <> 'CANCELLED' and o.placed_at >= now()-interval '30 days')
     and exists (select 1 from public.orders o where o.customer_id=c.id and o.status <> 'CANCELLED' and o.placed_at >= now()-interval '60 days' and o.placed_at < now()-interval '30 days')
     and not exists (select 1 from public.admin_anomaly_alerts x where x.alert_type='CUSTOMER_ORDER_DROP' and x.entity_id=c.id and x.created_at >= now()-interval '7 days');
-  get diagnostics alert_count = alert_count + row_count;
+  get diagnostics extra_count = row_count;
+  alert_count := alert_count + extra_count;
   return alert_count;
 end; $$;
 revoke all on function public.generate_admin_anomaly_alerts() from public, authenticated;
@@ -434,10 +435,10 @@ grant execute on function public.admin_customers_stopped_ordering(text,integer) 
 create or replace function public.admin_brand_revenue_comparison(p_brand_a text, p_brand_b text)
 returns table(brand text, revenue_pkr numeric(12,2), orders_count integer)
 language sql stable security invoker set search_path=public as $$
-  select b.name, coalesce(sum(ol.line_total_pkr),0)::numeric(12,2), count(distinct o.id)::integer
+  select b.name_en, coalesce(sum(ol.line_total_pkr),0)::numeric(12,2), count(distinct o.id)::integer
   from public.brands b join public.products p on p.brand_id=b.id join public.order_lines ol on ol.product_id=p.id join public.orders o on o.id=ol.order_id join public.customers c on c.id=o.customer_id
-  where public.has_permission(auth.uid(),'ai.analytics') and public.has_permission(auth.uid(),'financials.view_revenue') and o.status <> 'CANCELLED' and c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid())) and (o.placed_at at time zone 'Asia/Karachi')::date >= date_trunc('quarter',now() at time zone 'Asia/Karachi')::date and (b.name ilike trim(p_brand_a) or b.name ilike trim(p_brand_b))
-  group by b.name order by b.name;
+  where public.has_permission(auth.uid(),'ai.analytics') and public.has_permission(auth.uid(),'financials.view_revenue') and o.status <> 'CANCELLED' and c.assigned_agent_id in (select public.accessible_agent_ids(auth.uid())) and (o.placed_at at time zone 'Asia/Karachi')::date >= date_trunc('quarter',now() at time zone 'Asia/Karachi')::date and (b.name_en ilike trim(p_brand_a) or b.name_en ilike trim(p_brand_b))
+  group by b.name_en order by b.name_en;
 $$;
 grant execute on function public.admin_brand_revenue_comparison(text,text) to authenticated;
 

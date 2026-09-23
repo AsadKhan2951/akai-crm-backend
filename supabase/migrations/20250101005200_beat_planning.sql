@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS public.beat_frequency_targets (
   CONSTRAINT beat_frequency_target_scope_check CHECK (customer_type IS NOT NULL OR vendor_group_id IS NOT NULL)
 );
 
+-- The Phase 2 placeholder beat_visits table (assigned_agent_id, visited_at) is replaced by the planned-visit model.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'beat_visits' AND column_name = 'visited_at')
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'beat_visits' AND column_name = 'beat_id') THEN
+    IF EXISTS (SELECT 1 FROM public.beat_visits) THEN
+      RAISE EXCEPTION 'Legacy beat_visits rows exist; migrate them before applying beat planning.';
+    END IF;
+    DROP TABLE public.beat_visits CASCADE;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS public.beat_visits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   beat_id uuid NOT NULL REFERENCES public.beats(id) ON DELETE CASCADE,

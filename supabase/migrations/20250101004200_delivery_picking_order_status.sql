@@ -11,7 +11,7 @@ BEGIN
   IF p_quantity_short > 0 AND nullif(trim(p_short_reason),'') IS NULL THEN RAISE EXCEPTION 'A shortage reason is required.'; END IF;
   UPDATE public.picking_list_lines SET quantity_picked=p_quantity_picked,quantity_short=p_quantity_short,short_reason=nullif(trim(p_short_reason),'') WHERE id=p_picking_list_line_id;
   SELECT NOT EXISTS (SELECT 1 FROM public.picking_list_lines l WHERE l.picking_list_id=list_id AND l.quantity_picked+l.quantity_short<l.quantity_required) INTO list_complete;
-  UPDATE public.picking_lists SET status=CASE WHEN list_complete THEN 'COMPLETED' ELSE 'OPEN' END,completed_at=CASE WHEN list_complete THEN now() ELSE NULL END WHERE id=list_id;
+  UPDATE public.picking_lists SET status=(CASE WHEN list_complete THEN 'COMPLETED' ELSE 'OPEN' END)::"PickingListStatus",completed_at=CASE WHEN list_complete THEN now() ELSE NULL END WHERE id=list_id;
   IF list_complete THEN
     UPDATE public.orders o SET status='PICKED'
     WHERE o.id IN (SELECT DISTINCT ol.order_id FROM public.picking_list_order_lines pol JOIN public.order_lines ol ON ol.id=pol.order_line_id JOIN public.picking_list_lines pl ON pl.id=pol.picking_list_line_id WHERE pl.picking_list_id=list_id)

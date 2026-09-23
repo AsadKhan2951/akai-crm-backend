@@ -135,6 +135,20 @@ ALTER TABLE public.scheme_tiers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.scheme_audiences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.scheme_applications ENABLE ROW LEVEL SECURITY;
 
+-- Audience membership is checked in a SECURITY DEFINER helper so the schemes and scheme_audiences
+-- policies do not reference each other (that caused infinite policy recursion).
+CREATE OR REPLACE FUNCTION public.scheme_audience_matches_user(p_scheme_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.scheme_audiences sa
+    JOIN public.customers c ON c.id = sa.customer_id OR (sa.vendor_group_id IS NOT NULL AND c.vendor_group_id = sa.vendor_group_id)
+    JOIN public.customer_users cu ON cu.customer_id = c.id AND cu.user_id = auth.uid()
+    WHERE sa.scheme_id = p_scheme_id
+  );
+$$;
+GRANT EXECUTE ON FUNCTION public.scheme_audience_matches_user(uuid) TO authenticated;
+
 DROP POLICY IF EXISTS schemes_select_visible ON public.schemes;
 CREATE POLICY schemes_select_visible ON public.schemes FOR SELECT TO authenticated
 USING (
@@ -145,20 +159,7 @@ USING (
       is_active AND now() >= starts_at AND now() < ends_at
       AND (
         audience_type = 'ALL'
-        OR EXISTS (
-          SELECT 1
-          FROM public.scheme_audiences sa
-          JOIN public.customers c ON c.id = sa.customer_id
-          JOIN public.customer_users cu ON cu.customer_id = c.id AND cu.user_id = auth.uid()
-          WHERE sa.scheme_id = schemes.id
-        )
-        OR EXISTS (
-          SELECT 1
-          FROM public.scheme_audiences sa
-          JOIN public.customers c ON c.vendor_group_id = sa.vendor_group_id
-          JOIN public.customer_users cu ON cu.customer_id = c.id AND cu.user_id = auth.uid()
-          WHERE sa.scheme_id = schemes.id
-        )
+        OR public.scheme_audience_matches_user(schemes.id)
       )
     )
   )

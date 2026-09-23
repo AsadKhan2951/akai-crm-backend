@@ -33,7 +33,7 @@ BEGIN
   LEFT JOIN public.sales_agents sa ON sa.id = c.assigned_agent_id
   WHERE c.id = p_customer_id AND c.is_internal_account = false
     AND c.status <> 'BLOCKED' AND c.whatsapp_phone = p_phone
-  FOR UPDATE;
+  FOR UPDATE OF c;
   IF NOT FOUND OR customer_row.assigned_agent_id IS NULL OR customer_row.agent_user_id <> p_placed_by_user_id THEN
     RAISE EXCEPTION USING errcode = '42501', message = 'Verified WhatsApp customer scope is required.';
   END IF;

@@ -23,8 +23,8 @@ begin
   end if;
   insert into public.collection_reminder_preferences(customer_id,opted_out,preferred_locale,updated_by_user_id)
   values(p_customer_id,p_opted_out,p_preferred_locale,auth.uid())
-  on conflict(customer_id) do update set opted_out=excluded.opted_out,preferred_locale=excluded.preferred_locale,updated_by_user_id=auth.uid(),updated_at=now()
-  returning customer_id;
+  on conflict(customer_id) do update set opted_out=excluded.opted_out,preferred_locale=excluded.preferred_locale,updated_by_user_id=auth.uid(),updated_at=now();
+  return p_customer_id;
 end; $$;
 grant execute on function public.set_collection_reminder_preference(uuid,boolean,text) to authenticated;
 
