@@ -30,6 +30,12 @@ Bugs fixed in existing migrations so the chain runs: 0013 (anomaly alerts, brand
 Added:
 - `20250101005800_seed_permissions_and_roles.sql`: 115 permissions, 8 preset roles, and `bootstrap_first_admin()`.
 - `20250101005900_vendor_rewards_access.sql`: vendors can see active rewards and request redemptions.
+- `20250101006000_function_privilege_hardening.sql`: **security fix.** Internal SECURITY DEFINER helpers were callable by any logged-in user. For example, `apply_loyalty_delta` could give a Vendor free points and `apply_customer_ledger_delta` could change any balance. They are now service-role or internal only. Also: `vendor_customer_for_user` no longer reveals other users' shops, and GLOBAL admins can record payments for unassigned customers.
+- `20250101006100_vendor_product_visibility_rls.sql`: **security fix.** Vendors could read every product and image through the REST API, including hidden ones. Vendor-portal users now see only `resolve_visible_products` for their shop, plus products already on their own orders, quotes and carts.
+- `20250101006200_price_list_editing.sql`: `create_price_list_draft`, `set_price_list_item`, `remove_price_list_item` for the Admin price-list screens.
+- `20250101006300_user_onboarding.sql`: user onboarding. An Admin adds the person in CRM → Users (role, plus shop for a Vendor or agent code for a Sales Agent). The login is created in Supabase Auth with the same email. A trigger on `auth.users` (or `provision_invited_user()`) creates the CRM user, the `customer_users` link and the `sales_agents` row. No service-role key is used in the app.
+- `20250101006500_import_customer_workbook.sql`: the real CUSTOMERDATAFORCRM.xlsx import. 206 customers (Haris 102, Daniyal 104) and 88 area codes. Idempotent. 21 possible duplicates are flagged for review and not merged. Customers are assigned automatically when a Sales Agent with agent code HARIS or DANIYAL is created.
+- `20250101006400_catalogue_pdf_cache_access.sql`: **security fix.** The Vendor role has `pricelist.view`, so vendors could read every price-list row and every dealer's cached PDF. Both are now scoped to the vendor's own visible products and shop folder. Also adds `active_price_list_id()` for the 24-hour PDF cache.
 
 If the original files ever turn up, compare them before replacing. Test on staging first.
 
@@ -42,7 +48,13 @@ If the original files ever turn up, compare them before replacing. Test on stagi
    select public.bootstrap_first_admin('admin@yourcompany.com', 'Your Name');
    ```
    This gives that user the Administrator role. It only works once, while no active admin exists.
-4. Log in on the Frontend with that email and password. Create all other users from the Admin portal.
+4. Log in on the Frontend with that email and password.
+
+## Adding more users (Sales Agents, Vendors, staff)
+
+1. CRM → Admin → Users → **Create user**: email, name, role. For a Vendor, pick their shop. For a Sales Agent, add the agent code, e.g. HARIS.
+2. Supabase → Authentication → Users → **Add user**: same email plus a password. Tick Auto Confirm.
+3. The login links automatically. If the login existed first, the CRM links it as soon as the form is saved; **Link now** retries.
 
 ## Migration file naming
 
